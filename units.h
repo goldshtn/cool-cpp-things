@@ -3,10 +3,12 @@
 
 #include <iostream>
 
+#include "intvector.h"
+
 namespace units
 {
 
-    template <int Mass, int Time, int Length>
+    template <typename IntVector>
     struct unit
     {
         double value_;
@@ -18,36 +20,45 @@ namespace units
         { return value_; }
     };
 
-    template <int M1, int T1, int L1>
-    unit<M1, T1, L1> operator+(unit<M1, T1, L1> u1, unit<M1, T1, L1> u2)
+    template <typename IntVector>
+    unit<IntVector> operator+(unit<IntVector> u1, unit<IntVector> u2)
     {
         return u1.value() + u2.value();
     }
 
-    template <int M1, int T1, int L1>
-    unit<M1, T1, L1> operator-(unit<M1, T1, L1> u1, unit<M1, T1, L1> u2)
+    template <typename IntVector>
+    unit<IntVector> operator-(unit<IntVector> u1, unit<IntVector> u2)
     {
         return u1.value() - u2.value();
     }
 
-    template <int M1, int T1, int L1, int M2, int T2, int L2>
-    unit<M1 + M2, T1 + T2, L1 + L2> operator*(unit<M1, T1, L1> u1, unit<M2, T2, L2> u2)
+    template <int... Ints1, int... Ints2>
+    unit<typename intvector_add<intvector<Ints1...>, intvector<Ints2...>>::type>
+    operator*(
+            unit<intvector<Ints1...>> u1,
+            unit<intvector<Ints2...>> u2)
     {
         return u1.value() * u2.value();
     }
 
-    template <int M1, int T1, int L1, int M2, int T2, int L2>
-    unit<M1 - M2, T1 - T2, L1 - L2> operator/(unit<M1, T1, L1> u1, unit<M2, T2, L2> u2)
+    template <int... Ints1, int... Ints2>
+    unit<typename intvector_subtract<intvector<Ints1...>, intvector<Ints2...>>::type>
+    operator/(
+            unit<intvector<Ints1...>> u1,
+            unit<intvector<Ints2...>> u2)
     {
         return u1.value() / u2.value();
     }
 
-    using scalar = unit<0, 0, 0>;
-    using mass = unit<1, 0, 0>;
-    using time = unit<0, 1, 0>;
-    using distance = unit<0, 0, 1>;
-    using speed = unit<0, -1, 1>; // meters per second
-    using acceleration = unit<0, -2, 1>; // meters per second per second
+    template <int Mass, int Time, int Length>
+    using system = intvector<Mass, Time, Length>;
+
+    using scalar = unit<system<0, 0, 0>>;
+    using mass = unit<system<1, 0, 0>>;
+    using time = unit<system<0, 1, 0>>;
+    using distance = unit<system<0, 0, 1>>;
+    using speed = unit<system<0, -1, 1>>; // meters per second
+    using acceleration = unit<system<0, -2, 1>>; // meters per second per second
 
     void symbol_sequence(std::ostream& os, std::initializer_list<std::pair<int, std::string>> seq)
     {
@@ -85,11 +96,11 @@ namespace units
         }
     }
 
-    template <int M1, int T1, int L1>
-    std::ostream& operator<<(std::ostream& os, unit<M1, T1, L1> u)
+    template <int Mass, int Time, int Length>
+    std::ostream& operator<<(std::ostream& os, unit<system<Mass, Time, Length>> u)
     {
         os << u.value() << " ";
-        symbol_sequence(os, {{M1, "kg"},{T1, "s"},{L1,"m"}});
+        symbol_sequence(os, {{Mass, "kg"},{Time, "s"},{Length,"m"}});
         return os;
     }
 
