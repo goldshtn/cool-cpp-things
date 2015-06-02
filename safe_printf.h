@@ -62,24 +62,28 @@ void safe_printf(std::string const& format)
 {
     if (count_format_specifiers(format) != 0)
         throw std::invalid_argument("number of arguments doesn't match the format string");
+
     std::cout << unquote_format_specifiers(format);
 }
 
 template <typename Head, typename... Tail>
-void safe_printf(std::string const& format, Head&& head, Tail&&... tail)
+void safe_printf(std::string const& format, Head head, Tail... tail)
 {
     if (count_format_specifiers(format) != sizeof...(Tail) + 1)
         throw std::invalid_argument("number of arguments doesn't match the format string");
+
     auto first_format_pos = format.find_first_of(FORMAT_SPECIFIER);
     std::cout << format.substr(0, first_format_pos);
+
     if (first_format_pos != format.size() - 1 && format[first_format_pos+1] == FORMAT_SPECIFIER)
         ++first_format_pos;
+
     std::cout << head;
-    safe_printf(format.substr(first_format_pos+1), std::forward<Tail>(tail)...);
+    safe_printf(format.substr(first_format_pos+1), tail...);
 }
 
 template <typename... Types>
-constexpr unsigned sizeof_args(Types&&...)
+constexpr unsigned sizeof_args(Types...)
 {
     return static_cast<unsigned int>(sizeof...(Types));
 }

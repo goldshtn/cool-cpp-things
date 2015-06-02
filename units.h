@@ -32,20 +32,20 @@ namespace units
         return u1.value() - u2.value();
     }
 
-    template <int... Ints1, int... Ints2>
-    unit<typename intvector_add<intvector<Ints1...>, intvector<Ints2...>>::type>
+    template <typename IntVector1, typename IntVector2>
+    unit<typename intvector_add<IntVector1, IntVector2>::type>
     operator*(
-            unit<intvector<Ints1...>> u1,
-            unit<intvector<Ints2...>> u2)
+            unit<IntVector1> u1,
+            unit<IntVector2> u2)
     {
         return u1.value() * u2.value();
     }
 
-    template <int... Ints1, int... Ints2>
-    unit<typename intvector_subtract<intvector<Ints1...>, intvector<Ints2...>>::type>
+    template <typename IntVector1, typename IntVector2>
+    unit<typename intvector_subtract<IntVector1, IntVector2>::type>
     operator/(
-            unit<intvector<Ints1...>> u1,
-            unit<intvector<Ints2...>> u2)
+            unit<IntVector1> u1,
+            unit<IntVector2> u2)
     {
         return u1.value() / u2.value();
     }
@@ -102,6 +102,22 @@ namespace units
         os << u.value() << " ";
         symbol_sequence(os, {{Mass, "kg"},{Time, "s"},{Length,"m"}});
         return os;
+    }
+
+    inline namespace literals
+    {
+        mass operator "" _kg(long double kg)
+        {
+            return mass(kg);
+        }
+        distance operator "" _m(long double m)
+        {
+            return distance(m);
+        }
+        time operator "" _s(long double s)
+        {
+            return time(s);
+        }
     }
 
 } // namespace units

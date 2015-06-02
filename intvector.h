@@ -8,11 +8,14 @@ struct intvector
     static constexpr int length = sizeof...(Ints);
 };
 
+// Two empty intvectors are equal
 constexpr bool intvector_equal(intvector<>, intvector<>)
 {
     return true;
 }
 
+// Two non-empty intvectors are equal if the first ints are equal
+// and the tail recursively compares as equal
 template <int Int1, int... Ints1, int Int2, int... Ints2>
 constexpr bool intvector_equal(intvector<Int1, Ints1...>, intvector<Int2, Ints2...>)
 {
@@ -20,6 +23,7 @@ constexpr bool intvector_equal(intvector<Int1, Ints1...>, intvector<Int2, Ints2.
     return (Int1 == Int2) && intvector_equal(intvector<Ints1...>(), intvector<Ints2...>());
 }
 
+// Prepends an int to the beginning of an intvector
 template <int, typename>
 struct intvector_prepend;
 
@@ -29,6 +33,8 @@ struct intvector_prepend<Int, intvector<Ints...>>
     using type = intvector<Int, Ints...>;
 };
 
+// Produces a new intvector that is the pointwise sum
+// of two intvectors
 template <typename...>
 struct intvector_add;
 
@@ -48,6 +54,8 @@ struct intvector_add<intvector<Int1, Ints1...>, intvector<Int2, Ints2...>>
     >::type;
 };
 
+// Produces a new intvector that is the pointwise difference
+// between two intvectors
 template <typename...>
 struct intvector_subtract;
 

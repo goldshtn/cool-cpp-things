@@ -5,12 +5,16 @@
 #include <type_traits>
 #include <vector>
 
+// Base case -- use the typeid facility to produce the name
+// of the type. This potentially produces ugly names for basic
+// types like 'int'.
 template <typename T>
 struct namer
 {
     static std::string name() { return typeid(T).name(); }
 };
 
+// Specialization to return a decent type name for 'int'
 template <>
 struct namer<int>
 {
